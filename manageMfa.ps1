@@ -1,9 +1,11 @@
+Add-Type -AssemblyName System.Windows.Forms
+
 Write-Host "Please authenticate with AAD..." -NoNewline
 Connect-MsolService
 Write-Host "thank you!`n"
 
 While($true){
-	$prompt =  "What would you like to do?`n1.) Check Status`n2.) Disable MFA`n3.) Enable MFA`n4.) Enforce MFA`n5.) Reset MFA`n6.) Exit`n"
+	$prompt =  "What would you like to do?`n1.) Check Status`n2.) Disable MFA`n3.) Enable MFA`n4.) Enforce MFA`n5.) Reset MFA`n6.) Bulk Enforce`n7.) Exit`n"
 
 	$option = Read-Host $prompt
 
@@ -68,6 +70,27 @@ While($true){
 	}
 	
 	elseif ($option -eq 6){
+		$FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{
+			InitialDirectory = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
+			Filter = 'Text (*.txt)|*.txt'
+		}
+		$null = $FileBrowser.ShowDialog() #ShowDialog() does not return anything useful for us. Selection modifies $FileBrowser
+		
+		$strongAuth = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
+		$strongAuth.RelyingParty = "*"
+		$strongAuth.State = "Enforced"
+		$strongAuthRequirements = @($strongAuth)
+		
+		
+		Write-Host "Enforcing MFA for all users in file..." -NoNewline
+		Get-Content $FileBrowser.filename | ForEach-Object {
+			Set-MsolUser -UserPrincipalName $_ -StrongAuthenticationRequirements $strongAuthRequirements
+		}
+		Write-Host "done.`n"
+		
+	}
+		
+	elseif ($option -eq 7){
 		break
 	}
 	
