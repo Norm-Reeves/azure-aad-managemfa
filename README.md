@@ -13,7 +13,7 @@ Important to Note:
 
 Download .exe
 =========
-https://github.com/Norm-Reeves/azure-aad-managemfa/releases/download/v1.1/manageAadMfaV1.1.exe
+https://github.com/Norm-Reeves/azure-aad-managemfa/releases/download/v1.1/manageMfaV1.1.exe
 
 Change Log:
 ============
